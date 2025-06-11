@@ -1,4 +1,4 @@
-# restaurant-survey-sql
+# Restaurant-Survey-SQL
 
 ## Proyecto SQL - Análisis de Encuesta de Satisfacción de un Restaurante
 
