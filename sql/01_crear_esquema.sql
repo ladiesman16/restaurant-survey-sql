@@ -1,51 +1,53 @@
-
 BEGIN;
 
--- Creamos esta extencion para poder utilizar tildes libremente
+-- (1) Habilitar extensión para manejo de tildes en limpieza de datos
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
-CREATE SCHEMA IF NOT EXISTS restaurant;
-SET search_path TO restaurant, public;
+-- (2) Esquema propio para mantener ordenados los objetos
+CREATE SCHEMA IF NOT EXISTS encuesta;
+SET search_path TO encuesta, public;
 
-CREATE DOMAIN IF NOT EXISTS calificacion_1_5 AS SMALLINT
+-- (3) Dominio de puntuación 1-5, para validación centralizada
+CREATE DOMAIN IF NOT EXISTS puntuacion_1_5 AS SMALLINT
       CHECK (VALUE BETWEEN 1 AND 5);
 
-CREATE TABLE IF NOT EXISTS encuesta_raw (
-    id_respuesta      INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    marca_tiempo      TIMESTAMPTZ,
-    sexo_txt               TEXT,
-    rango_edad_txt         TEXT,
-    barrio_txt             TEXT,
-    frecuencia_visita_txt  TEXT,
-    motivo_principal_txt   TEXT,
-    aspecto_valorado_txt   TEXT,
-    calif_platos_txt       TEXT,
-    calif_servicio_txt     TEXT,
-    calif_atmosfera_txt    TEXT,
-    calif_ambientacion_txt TEXT,
-    menu_favorito_txt      TEXT,
-    recomendacion_txt      TEXT,
-    problemas_txt          TEXT,
-    extra_txt              TEXT,
-    interes_eventos_txt    TEXT,
-    calif_global_txt       TEXT,
-    email_txt              TEXT
+-- (4) Tabla raw: carga directa del CSV, sin transformación previa
+CREATE TABLE IF NOT EXISTS respuestas_raw (
+    id_respuesta        INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    marca_temporal      TIMESTAMPTZ,
+    sexo                TEXT,
+    edad                TEXT,
+    barrio              TEXT,
+    frecuencia_visita   TEXT,
+    motivo_visita       TEXT,
+    aspecto_motivador   TEXT,
+    definicion_lugar    TEXT,
+    calif_platos        TEXT,
+    calif_servicio      TEXT,
+    calif_atmosfera     TEXT,
+    sugerencia_ambiente TEXT,
+    preferidos_menu     TEXT,
+    desea_nuevo_menu    TEXT,
+    problemas           TEXT,
+    interes_eventos     TEXT,
+    recomendacion       TEXT,
+    puntuacion          TEXT
 );
 
--- Creamos tablas de dimension
+-- (5) Tablas de dimensión: para valores únicos de campos clave
 CREATE TABLE IF NOT EXISTS dim_sexo (
     id_sexo SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sexo    TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS dim_rango_edad (
-    id_rango SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    rango    TEXT NOT NULL UNIQUE
+CREATE TABLE IF NOT EXISTS dim_edad (
+    id_edad SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    edad    TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS dim_barrio (
     id_barrio SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    barrio    TEXT NOT NULL UNIQUE
+    barrio   TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS dim_frecuencia_visita (
@@ -53,43 +55,42 @@ CREATE TABLE IF NOT EXISTS dim_frecuencia_visita (
     frecuencia    TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS dim_motivo_principal (
+CREATE TABLE IF NOT EXISTS dim_motivo_visita (
     id_motivo SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     motivo    TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS dim_aspecto_valorado (
+CREATE TABLE IF NOT EXISTS dim_aspecto_motivador (
     id_aspecto SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     aspecto    TEXT NOT NULL UNIQUE
 );
 
-
-CREATE TABLE IF NOT EXISTS encuesta_resumen (
-    id_respuesta   INTEGER PRIMARY KEY REFERENCES encuesta_raw(id_respuesta),
-    marca_tiempo   TIMESTAMPTZ NOT NULL,
-
-    id_sexo        SMALLINT REFERENCES dim_sexo,
-    id_rango       SMALLINT REFERENCES dim_rango_edad,
-    id_barrio      SMALLINT REFERENCES dim_barrio,
-    id_frecuencia  SMALLINT REFERENCES dim_frecuencia_visita,
-    id_motivo      SMALLINT REFERENCES dim_motivo_principal,
-    id_aspecto     SMALLINT REFERENCES dim_aspecto_valorado,
-
-    calif_platos     calificacion_1_5,
-    calif_servicio   calificacion_1_5,
-    calif_atmosfera  calificacion_1_5,
-    calif_ambientacion calificacion_1_5,
-    calif_global     calificacion_1_5,
-
-    menu_favorito    TEXT,
-    recomendacion    TEXT,
-    problemas        TEXT,
-    extra            TEXT,
-    interes_eventos  TEXT
+-- (6) Tabla final limpia: respuestas estandarizadas y normalizadas
+CREATE TABLE IF NOT EXISTS respuestas_limpias (
+    id_respuesta      INTEGER PRIMARY KEY REFERENCES respuestas_raw(id_respuesta),
+    marca_temporal    TIMESTAMPTZ NOT NULL,
+    id_sexo           SMALLINT REFERENCES dim_sexo,
+    id_edad           SMALLINT REFERENCES dim_edad,
+    id_barrio         SMALLINT REFERENCES dim_barrio,
+    id_frecuencia     SMALLINT REFERENCES dim_frecuencia_visita,
+    id_motivo         SMALLINT REFERENCES dim_motivo_visita,
+    id_aspecto        SMALLINT REFERENCES dim_aspecto_motivador,
+    definicion_lugar  TEXT,
+    calif_platos      puntuacion_1_5,
+    calif_servicio    puntuacion_1_5,
+    calif_atmosfera   puntuacion_1_5,
+    sugerencia_ambiente TEXT,
+    preferidos_menu     TEXT,
+    desea_nuevo_menu    TEXT,
+    problemas           TEXT,
+    interes_eventos     TEXT,
+    recomendacion       TEXT,
+    puntuacion          puntuacion_1_5
 );
 
-CREATE INDEX IF NOT EXISTS idx_resumen_fecha   ON encuesta_resumen (marca_tiempo);
-CREATE INDEX IF NOT EXISTS idx_resumen_barrio  ON encuesta_resumen (id_barrio);
-CREATE INDEX IF NOT EXISTS idx_resumen_sexo    ON encuesta_resumen (id_sexo);
+-- (7) Índices útiles para análisis y BI
+CREATE INDEX IF NOT EXISTS idx_limpias_fecha   ON respuestas_limpias (marca_temporal);
+CREATE INDEX IF NOT EXISTS idx_limpias_barrio  ON respuestas_limpias (id_barrio);
+CREATE INDEX IF NOT EXISTS idx_limpias_sexo    ON respuestas_limpias (id_sexo);
 
 COMMIT;
