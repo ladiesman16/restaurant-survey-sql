@@ -55,23 +55,15 @@ Para obtener análisis más significativos y evitar la dispersión de respuestas
 
 Por ejemplo:
 
-“Carrasco”, “Carrasco Norte”, “Barra de Carrasco”, “Portones”, “Paso Carrasco”, “San José de Carrasco”, “Colinas de Carrasco”, “La Cruz de Carrasco” → Carrasco
-
-“Malvín”, “Malvín Norte”, “Malvin Norte (Parque Rivera)”, “Malvín Alto”, “Malvín Sur” → Malvín
-
-“Blanqueada”, “La Blanqueada”, “La Blanqueqda” → Blanqueada
-
-“Parque Batlle”, “Parque Battle” → Parque Batlle
-
-“Pocitos”, “Pocitos Nuevo” → Pocitos
-
-“Parque Miramar”, “P Miramar” → Parque Miramar
-
-“Punta Gorda”, “Punta Hirda” → Punta Gorda
-
-“Lagomar”, “Lagomar, Canelones” → Lagomar
-
-“Costa de Oro”, “El Pinar”, “El Pinar, Costa de Oro”, “Pinamar - Costa de Oro”, “Solymar”, “Lomas de Solymar”, “Tala - Canelones”, “Costa de Oro - Pinamar” → Costa de Oro
+- “Carrasco”, “Carrasco Norte”, “Barra de Carrasco”, “Portones”, “Paso Carrasco”, “San José de Carrasco”, “Colinas de Carrasco”, “La Cruz de Carrasco” → Carrasco
+- “Malvín”, “Malvín Norte”, “Malvin Norte (Parque Rivera)”, “Malvín Alto”, “Malvín Sur” → Malvín
+- “Blanqueada”, “La Blanqueada”, “La Blanqueqda” → Blanqueada
+- “Parque Batlle”, “Parque Battle” → Parque Batlle
+- “Pocitos”, “Pocitos Nuevo” → Pocitos
+- “Parque Miramar”, “P Miramar” → Parque Miramar
+- “Punta Gorda”, “Punta Hirda” → Punta Gorda
+- “Lagomar”, “Lagomar, Canelones” → Lagomar
+- “Costa de Oro”, “El Pinar”, “El Pinar, Costa de Oro”, “Pinamar - Costa de Oro”, “Solymar”, “Lomas de Solymar”, “Tala - Canelones”, “Costa de Oro - Pinamar” → Costa de Oro
 
 (Otras respuestas menos frecuentes se dejan como están para mantener su identidad local.)
 
