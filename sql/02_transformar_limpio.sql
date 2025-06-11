@@ -90,4 +90,61 @@ LEFT JOIN encuesta.dim_frecuencia_visita f ON r.frecuencia_visita = f.frecuencia
 LEFT JOIN encuesta.dim_motivo_visita m ON r.motivo_visita = m.motivo
 LEFT JOIN encuesta.dim_aspecto_motivador a ON r.aspecto_motivador = a.aspecto;
 
+# Normalizamos los datos de barrios para que esten bien organizados
+
+INSERT INTO encuesta.dim_barrio (barrio)
+SELECT DISTINCT barrio FROM encuesta.respuestas_raw WHERE barrio IS NOT NULL
+ON CONFLICT DO NOTHING;
+
+UPDATE encuesta.dim_barrio
+SET barrio_normalizado = CASE
+    -- MALDONADO y Punta del Este
+    WHEN lower(barrio) LIKE '%punta del este%' OR lower(barrio) LIKE '%maldonado%' OR lower(barrio) LIKE '%san francisco%' OR lower(barrio) LIKE '%pinares%' THEN 'Maldonado'
+    -- CANELONES: La Floresta, Atlántida, Parque del Plata, Salinas, Pinamar, Colonia Valdense, Barros Blancos, Tala
+    WHEN lower(barrio) LIKE '%la floresta%' OR lower(barrio) LIKE '%tlantida%' OR lower(barrio) LIKE '%parque del plata%' OR lower(barrio) LIKE '%salinas%' OR lower(barrio) LIKE '%pinamar%' OR lower(barrio) LIKE '%colonia valdense%' OR lower(barrio) LIKE '%barros blancos%' OR lower(barrio) LIKE '%tala%' THEN 'Canelones'
+    -- Ciudad de la Costa
+    WHEN lower(barrio) LIKE '%ciudad de la costa%' THEN 'Ciudad de la Costa'
+    -- Carrasco y variantes
+    WHEN lower(barrio) LIKE '%carrasco%' OR lower(barrio) LIKE '%portones%' OR lower(barrio) LIKE '%aeropuerto%' THEN 'Carrasco'
+    -- Malvin y variantes
+    WHEN lower(barrio) LIKE 'malvin%' OR lower(barrio) LIKE 'malvín%' OR lower(barrio) LIKE '%parque rivera%' THEN 'Malvin'
+    -- Pocitos
+    WHEN lower(barrio) LIKE 'pocitos%' THEN 'Pocitos'
+    -- Costa de Oro y variantes (excepto Ciudad de la Costa y Canelones ya tratados arriba)
+    WHEN lower(barrio) LIKE '%lagomar%' OR lower(barrio) LIKE '%el pinar%' OR lower(barrio) LIKE '%solymar%' OR lower(barrio) LIKE '%lomas de solymar%' OR lower(barrio) LIKE '%shangril%' OR lower(barrio) LIKE '%inar' OR lower(barrio) LIKE '%ando' OR lower(barrio) LIKE '%osta de oro' THEN 'Costa de Oro'
+    -- Blanqueada
+    WHEN lower(barrio) LIKE '%blanqueada%' THEN 'Blanqueada'
+    -- Punta Gorda
+    WHEN lower(barrio) LIKE '%punta gorda%' OR lower(barrio) LIKE '%punta hirda%' THEN 'Punta Gorda'
+    -- Parque Batlle
+    WHEN lower(barrio) LIKE '%parque batlle%' OR lower(barrio) LIKE '%parque battle%' THEN 'Parque Batlle'
+    -- Cordón
+    WHEN lower(barrio) LIKE '%cordon%' OR lower(barrio) LIKE '%cordón%' THEN 'Cordón'
+    -- Centro
+    WHEN lower(barrio) LIKE '%centro%' THEN 'Centro'
+    -- Buceo
+    WHEN lower(barrio) LIKE '%buceo%' THEN 'Buceo'
+    -- Sayago
+    WHEN lower(barrio) LIKE '%sayago%' THEN 'Sayago'
+    -- Prado
+    WHEN lower(barrio) LIKE '%prado%' THEN 'Prado'
+    -- Jardines
+    WHEN lower(barrio) LIKE '%jardines%' THEN 'Jardines'
+    -- Flor de Maroñas
+    WHEN lower(barrio) LIKE '%flor de maroñas%' THEN 'Flor de Maroñas'
+    -- Curva de Maroñas
+    WHEN lower(barrio) LIKE '%curva de maroñas%' THEN 'Curva de Maroñas'
+    -- Palermo
+    WHEN lower(barrio) LIKE '%palermo%' THEN 'Palermo'
+    -- Punta Carretas
+    WHEN lower(barrio) LIKE '%punta carretas%' THEN 'Punta Carretas'
+    -- Tres Cruces
+    WHEN lower(barrio) LIKE '%tres cruces%' OR lower(barrio) LIKE '%la comercial tres cruces%' THEN 'Tres Cruces'
+    -- Unión
+    WHEN lower(barrio) LIKE '%union%' OR lower(barrio) LIKE '%unión%' THEN 'Unión'
+    -- Parque Miramar
+    WHEN lower(barrio) LIKE '%iramar%' THEN 'Parque Miramar'
+    ELSE barrio
+END;
+
 COMMIT;
