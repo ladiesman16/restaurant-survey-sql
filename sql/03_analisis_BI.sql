@@ -5,9 +5,9 @@ SELECT db.barrio_normalizado, COUNT(*) AS respuestas
 FROM encuesta.respuestas_limpias rl
 JOIN encuesta.dim_barrio db ON rl.id_barrio = db.id_barrio
 GROUP BY db.barrio_normalizado
-
 ORDER BY COUNT(*) DESC;
-Satisfaccion promedio por platos
+
+-- Satisfaccion promedio por platos
 SELECT db.barrio_normalizado, AVG(rl.calif_platos) AS promedio_satisfaccion
 FROM encuesta.respuestas_limpias rl
 JOIN encuesta.dim_barrio db ON rl.id_barrio = db.id_barrio
